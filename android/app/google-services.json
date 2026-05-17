@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "438525704106",
+    "project_id": "reservas-citas-c2198",
+    "storage_bucket": "reservas-citas-c2198.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:438525704106:android:d0c8038a830ea76a9a1dd3",
+        "android_client_info": {
+          "package_name": "com.example.reservas_citas"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCdJTUTkPal00iBJKZa5ohXlvemxS3T4xw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
