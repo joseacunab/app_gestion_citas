@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../componentes/checklist_evento_detalle.dart';
 import '../componentes/etiqueta_prioridad.dart';
 import '../componentes/icono_categoria.dart';
 import '../componentes/modal_evento.dart';
 import '../controladores/proveedores.dart';
 import '../entidades/categoria.dart';
-import '../entidades/evento.dart';
 import '../utilidades/formato.dart';
 
 class DetalleEventoPantalla extends ConsumerWidget {
@@ -35,9 +35,6 @@ class DetalleEventoPantalla extends ConsumerWidget {
     }
 
     final tema = Theme.of(context);
-    final checklistCompletados =
-        evento.checklist.where((c) => c.completado).length;
-
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -155,48 +152,7 @@ class DetalleEventoPantalla extends ConsumerWidget {
                   ],
                   if (evento.checklist.isNotEmpty) ...[
                     const SizedBox(height: 20),
-                    Row(
-                      children: [
-                        Text(
-                          'CHECKLIST',
-                          style: tema.textTheme.labelSmall?.copyWith(
-                            color: tema.colorScheme.onSurface
-                                .withValues(alpha: 0.45),
-                            letterSpacing: 1,
-                          ),
-                        ),
-                        const Spacer(),
-                        Text(
-                          '$checklistCompletados/${evento.checklist.length}',
-                          style: tema.textTheme.labelMedium,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    ...evento.checklist.map(
-                      (item) => Card(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        child: ListTile(
-                          leading: Icon(
-                            item.completado
-                                ? Icons.check_circle
-                                : Icons.circle_outlined,
-                            color: item.completado
-                                ? const Color(0xFF4A80F0)
-                                : null,
-                          ),
-                          title: Text(
-                            item.titulo,
-                            style: TextStyle(
-                              decoration: item.completado
-                                  ? TextDecoration.lineThrough
-                                  : null,
-                            ),
-                          ),
-                          onTap: () => _toggleChecklist(ref, evento, item.titulo),
-                        ),
-                      ),
-                    ),
+                    ChecklistEventoDetalle(evento: evento),
                   ],
                 ],
               ),
@@ -218,23 +174,6 @@ class DetalleEventoPantalla extends ConsumerWidget {
     );
   }
 
-  Future<void> _toggleChecklist(
-    WidgetRef ref,
-    Evento evento,
-    String tituloItem,
-  ) async {
-    final nuevaLista = evento.checklist.map((item) {
-      if (item.titulo == tituloItem) {
-        return item.copiarCon(completado: !item.completado);
-      }
-      return item;
-    }).toList();
-
-    await ref.read(eventoControladorProvider).actualizarChecklist(
-          evento.id,
-          nuevaLista,
-        );
-  }
 }
 
 class _DetalleCard extends StatelessWidget {

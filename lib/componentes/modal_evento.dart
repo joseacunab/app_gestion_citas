@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../controladores/evento_controlador.dart';
 import '../controladores/proveedores.dart';
 import '../entidades/evento.dart';
+import '../entidades/item_checklist.dart';
+import 'checklist_editor.dart';
 import 'selector_categoria_chips.dart';
 
 Future<void> mostrarModalEvento(
@@ -37,6 +39,7 @@ class _ModalEventoContenidoState extends ConsumerState<_ModalEventoContenido> {
   late String? _categoriaId;
   late String _prioridad;
   late bool _recordatorio;
+  late List<ItemChecklist> _checklist;
   bool _guardando = false;
 
   @override
@@ -54,6 +57,7 @@ class _ModalEventoContenidoState extends ConsumerState<_ModalEventoContenido> {
     _categoriaId = e?.categoriaId;
     _prioridad = e?.prioridad ?? 'normal';
     _recordatorio = e?.recordatorio ?? true;
+    _checklist = List<ItemChecklist>.from(e?.checklist ?? const []);
   }
 
   @override
@@ -112,7 +116,7 @@ class _ModalEventoContenidoState extends ConsumerState<_ModalEventoContenido> {
           icono: cat?.icono ?? 'event',
           completado: widget.eventoExistente?.completado ?? false,
           completadoEn: widget.eventoExistente?.completadoEn,
-          checklist: widget.eventoExistente?.checklist ?? const [],
+          checklist: _checklist,
         ),
       );
       if (mounted) Navigator.pop(context);
@@ -212,6 +216,11 @@ class _ModalEventoContenidoState extends ConsumerState<_ModalEventoContenido> {
             ),
             const SizedBox(height: 12),
             _campo('Notas', _descripcion, maxLineas: 3),
+            const SizedBox(height: 16),
+            ChecklistEditor(
+              items: _checklist,
+              onChanged: (lista) => setState(() => _checklist = lista),
+            ),
             const SizedBox(height: 12),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
