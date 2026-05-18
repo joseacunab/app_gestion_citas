@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../controladores/proveedores.dart';
-import '../utilidades/colores_util.dart';
-import '../utilidades/iconos_util.dart';
+import 'categoria_chip.dart';
+import 'modal_crear_categoria.dart';
 
 class SelectorCategoriaChips extends ConsumerWidget {
   const SelectorCategoriaChips({
@@ -17,44 +17,41 @@ class SelectorCategoriaChips extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final categorias = ref.watch(categoriasProvider).valueOrNull ?? [];
-    if (categorias.isEmpty) {
-      return const Text('No hay categorías cargadas en Firestore.');
-    }
+    final categoriasAsync = ref.watch(categoriasProvider);
 
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: categorias.map((cat) {
-        final seleccionada = cat.id == seleccionadaId;
-        final color = ColoresUtil.desdeHex(cat.color);
-        return FilterChip(
-          selected: seleccionada,
-          showCheckmark: false,
-          label: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 8,
-                height: 8,
-                decoration: BoxDecoration(
-                  color: color,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: 6),
-              Text(cat.nombre),
-            ],
-          ),
-          avatar: Icon(
-            IconosUtil.desdeNombre(cat.icono),
-            size: 16,
-            color: color,
-          ),
-          selectedColor: color.withValues(alpha: 0.2),
-          onSelected: (_) => alSeleccionar(cat.id),
+    return categoriasAsync.when(
+      data: (categorias) {
+        if (categorias.isEmpty) {
+          return const Text('No hay categorías disponibles.');
+        }
+
+        return Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            ...categorias.map((cat) {
+              return CategoriaChip(
+                categoria: cat,
+                seleccionada: cat.id == seleccionadaId,
+                onTap: () => alSeleccionar(cat.id),
+              );
+            }),
+            CategoriaChipCrear(
+              onTap: () async {
+                final nuevaId = await mostrarModalCrearCategoria(context, ref);
+                if (nuevaId != null) {
+                  alSeleccionar(nuevaId);
+                }
+              },
+            ),
+          ],
         );
-      }).toList(),
+      },
+      loading: () => const Padding(
+        padding: EdgeInsets.symmetric(vertical: 8),
+        child: LinearProgressIndicator(minHeight: 2),
+      ),
+      error: (_, __) => const Text('Error al cargar categorías.'),
     );
   }
 }

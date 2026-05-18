@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../controladores/proveedores.dart';
-import '../entidades/categoria.dart';
+import '../utilidades/categorias_util.dart';
 import '../utilidades/colores_util.dart';
 import '../utilidades/iconos_util.dart';
 
@@ -21,13 +21,7 @@ class IconoCategoria extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final categorias = ref.watch(categoriasProvider).valueOrNull ?? [];
-    Categoria? cat;
-    for (final c in categorias) {
-      if (c.id == categoriaId) {
-        cat = c;
-        break;
-      }
-    }
+    final cat = CategoriasUtil.buscarPorId(categoriaId, categorias);
 
     final color = cat != null
         ? ColoresUtil.desdeHex(cat.color)

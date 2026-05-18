@@ -44,6 +44,7 @@ final usuarioControladorProvider = Provider(
 final categoriaControladorProvider = Provider(
   (ref) => CategoriaControlador(
     categoriaServicio: ref.watch(categoriaServicioProvider),
+    usuarioId: ref.watch(usuarioIdProvider),
   ),
 );
 
@@ -86,7 +87,7 @@ final usuarioProvider = StreamProvider<Usuario?>((ref) {
 });
 
 final categoriasProvider = StreamProvider<List<Categoria>>((ref) {
-  return ref.watch(categoriaControladorProvider).observarCategorias();
+  return ref.watch(categoriaControladorProvider).observarCategoriasCombinadas();
 });
 
 final eventosProvider = StreamProvider<List<Evento>>((ref) {

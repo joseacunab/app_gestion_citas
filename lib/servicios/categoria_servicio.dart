@@ -11,8 +11,21 @@ class CategoriaServicio {
   CollectionReference<Map<String, dynamic>> get _coleccion =>
       _firestore.collection('categorias');
 
+  /// Todas las categorías en Firestore (legacy / admin).
   Stream<List<Categoria>> observarCategorias() {
     return _coleccion.snapshots().map((snapshot) {
+      return snapshot.docs
+          .map((doc) => Categoria.fromFirestore(doc.id, doc.data()))
+          .toList();
+    });
+  }
+
+  /// Solo categorías personalizadas del usuario autenticado.
+  Stream<List<Categoria>> observarCategoriasUsuario(String usuarioId) {
+    return _coleccion
+        .where('usuarioId', isEqualTo: usuarioId)
+        .snapshots()
+        .map((snapshot) {
       return snapshot.docs
           .map((doc) => Categoria.fromFirestore(doc.id, doc.data()))
           .toList();
@@ -23,5 +36,14 @@ class CategoriaServicio {
     final doc = await _coleccion.doc(categoriaId).get();
     if (!doc.exists || doc.data() == null) return null;
     return Categoria.fromFirestore(doc.id, doc.data()!);
+  }
+
+  Future<String> crear(Categoria categoria) async {
+    final ref = await _coleccion.add(categoria.toMap());
+    return ref.id;
+  }
+
+  Future<void> eliminar(String categoriaId) {
+    return _coleccion.doc(categoriaId).delete();
   }
 }
